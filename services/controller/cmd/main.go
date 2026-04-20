@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 	"controller/internal/proxycontroller"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -24,4 +28,9 @@ func main() {
 	}
 
 	controller.CreateProxy(context.Background(), 25565)
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+	sig := <-stop
+	log.Printf("Signal %v recieved\nStopping now...", sig)
 }

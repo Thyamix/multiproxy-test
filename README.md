@@ -1,7 +1,15 @@
 # Multi Proxy Test
 
-## Objective
+## Setup
+```bash
+kind create cluster --name multiproxy-test
+```
 
+```bash
+tilt up
+```
+
+## Objective
 Create a dynamically scaling multi proxy setup that I can test before trying to implement similar system for nimbusmc.
 
 - [ ] Kubernetes deployment for testing

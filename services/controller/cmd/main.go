@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"controller/internal/proxycontroller"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -14,6 +15,7 @@ import (
 )
 
 func main() {
+	fmt.Println("Starting controller")
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		panic(err.Error())
@@ -25,9 +27,14 @@ func main() {
 	controller := proxycontroller.ProxyController{
 		Clientset: *clientset,
 		Proxies:   []*corev1.Pod{},
+		Namespace: "multiproxy-test",
 	}
 
-	controller.CreateProxy(context.Background(), 25565)
+	fmt.Println("Starting proxy creation")
+	err = controller.CreateProxy(context.Background(), 25565)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)

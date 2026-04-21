@@ -6,7 +6,13 @@ if (k8s_context() != 'kind-multiproxy-test'):
 docker_build('multiproxy-test:local', './services/controller')
 
 k8s_yaml(['./kubernetes/namespace.yaml', './kubernetes/controller.yaml'])
-k8s_resource('controller', objects=['multiproxy-test:Namespace:default'])
+k8s_resource(
+    'controller',
+    objects=[
+        'multiproxy-test:Namespace:default',
+        'controller:Role:multiproxy-test',
+        'controller:RoleBinding:multiproxy-test',
+    ])
 
 # Build Docker image
 #   Tilt will automatically associate image builds with the resource(s)

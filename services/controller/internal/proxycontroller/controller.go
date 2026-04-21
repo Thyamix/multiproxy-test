@@ -2,6 +2,7 @@ package proxycontroller
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,12 +17,15 @@ const (
 type ProxyController struct {
 	Clientset kubernetes.Clientset
 	Proxies   []*corev1.Pod
+	Namespace string
 }
 
 func (c *ProxyController) CreateProxy(ctx context.Context, port int32) error {
+	fmt.Printf("Creating a new proxy on port %v\n", port)
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: "default",
+			Name:      "proxy",
+			Namespace: c.Namespace,
 			Labels: map[string]string{
 				"app":         "proxy",
 				"proxy-state": DESIRED,
@@ -42,7 +46,7 @@ func (c *ProxyController) CreateProxy(ctx context.Context, port int32) error {
 		},
 	}
 
-	newProxy, err := c.Clientset.CoreV1().Pods("default").Create(ctx, pod, metav1.CreateOptions{})
+	newProxy, err := c.Clientset.CoreV1().Pods(c.Namespace).Create(ctx, pod, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
@@ -53,9 +57,9 @@ func (c *ProxyController) CreateProxy(ctx context.Context, port int32) error {
 }
 
 func (c *ProxyController) GetProxy(ctx context.Context, name string) (*corev1.Pod, error) {
-	return c.Clientset.CoreV1().Pods("default").Get(ctx, name, metav1.GetOptions{})
+	return c.Clientset.CoreV1().Pods(c.Namespace).Get(ctx, name, metav1.GetOptions{})
 }
 
 func (c *ProxyController) DeleteProxy(ctx context.Context, name string) error {
-	return c.Clientset.CoreV1().Pods("default").Delete(ctx, name, metav1.DeleteOptions{})
+	return c.Clientset.CoreV1().Pods(c.Namespace).Delete(ctx, name, metav1.DeleteOptions{})
 }

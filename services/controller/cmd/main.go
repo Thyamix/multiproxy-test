@@ -35,9 +35,20 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("Starting proxy creation")
+	err = controller.CreateProxy(context.Background(), 25566)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Starting proxy creation")
+	err = controller.CreateProxy(context.Background(), 25567)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-stop
+	controller.ClearProxies(context.Background())
 	log.Printf("Signal %v recieved\nStopping now...", sig)
 }

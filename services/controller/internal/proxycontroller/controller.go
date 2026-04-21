@@ -24,8 +24,8 @@ func (c *ProxyController) CreateProxy(ctx context.Context, port int32) error {
 	fmt.Printf("Creating a new proxy on port %v\n", port)
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "proxy",
-			Namespace: c.Namespace,
+			GenerateName: "proxy-",
+			Namespace:    c.Namespace,
 			Labels: map[string]string{
 				"app":         "proxy",
 				"proxy-state": DESIRED,
@@ -53,6 +53,8 @@ func (c *ProxyController) CreateProxy(ctx context.Context, port int32) error {
 
 	c.Proxies = append(c.Proxies, newProxy)
 
+	fmt.Printf("%v with port %v created\n", newProxy.Name, port)
+
 	return nil
 }
 
@@ -62,4 +64,14 @@ func (c *ProxyController) GetProxy(ctx context.Context, name string) (*corev1.Po
 
 func (c *ProxyController) DeleteProxy(ctx context.Context, name string) error {
 	return c.Clientset.CoreV1().Pods(c.Namespace).Delete(ctx, name, metav1.DeleteOptions{})
+}
+
+func (c *ProxyController) ClearProxies(ctx context.Context) error {
+	for _, proxy := range c.Proxies {
+		err := c.Clientset.CoreV1().Pods(c.Namespace).Delete(ctx, proxy.Name, metav1.DeleteOptions{})
+		if err != nil {
+			panic(err)
+		}
+	}
+	return nil
 }

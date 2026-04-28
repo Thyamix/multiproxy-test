@@ -1,7 +1,7 @@
 allow_k8s_contexts('kind-multiproxy-test')
 
 if (k8s_context() != 'kind-multiproxy-test'):
-    fail("use correct context 'multiproxy-test', currently using " + k8s_context() + "\nrun 'kind create cluster --name multiproxy-test'\nOr if already created run 'kubectl config set-context kind-multiproxy-test'")
+    fail("use correct context 'multiproxy-test', currently using " + k8s_context() + "\nrun 'kind create cluster --name multiproxy-test'\nOr if already created run 'kubectl config use-context kind-multiproxy-test'")
 
 docker_build('multiproxy-test:local', './services/controller')
 
